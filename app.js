@@ -14,9 +14,9 @@
     // Data Structure /State
     const _state = {
         items : [
-            {id:0, name: 'Amala and Ewedu', calories: 400},
-            {id:1, name: 'Rice and dodo', calories: 200},
-            {id:2, name: 'Yam porridge', calories: 700}
+            // {id:0, name: 'Amala and Ewedu', calories: 400},
+            // {id:1, name: 'Rice and dodo', calories: 200},
+            // {id:2, name: 'Yam porridge', calories: 700}
         ],
         currentItem : null,
         totalCals : 0
@@ -48,6 +48,21 @@
             return newItem;
             
         },
+        getTotalCalories: function(){
+            let total = 0;
+
+            // Add calories of all items
+            _state.items.forEach(function(item){
+                total = total + item.calories;
+            })
+
+            // Set totalCals in State/Data structure
+            _state.totalCals = total;
+
+            // Return total Calories
+            return _state.totalCals;
+        },
+
         logState : function() {
             return _state;
         }
@@ -57,10 +72,11 @@
 // UI controller
 const UICtrl = (function(){ 
     const UISelectors = {
-        itemList: 'item-list',
+        itemList: '#item-list',
         addBtn: '.add-btn',
         itemNameInput: '#item-name',
-        itemCaloriesInput: '#item-calories'
+        itemCaloriesInput: '#item-calories',
+        totalCalories: '.total-calories'
     }
 
 
@@ -78,7 +94,7 @@ const UICtrl = (function(){
               </li>`
             });
 
-            document.getElementById(`${UISelectors.itemList}`).innerHTML = html;
+            document.querySelector(`${UISelectors.itemList}`).innerHTML = html;
         },
         getItemInput: function(){
             return {
@@ -87,6 +103,8 @@ const UICtrl = (function(){
             }
         },
         addListItem: function(item){
+            // Show item list
+            document.querySelector(UISelectors.itemList).style.display = 'block';
             // Create an li element
             const li = document.createElement('li');
             // Add li class
@@ -100,11 +118,17 @@ const UICtrl = (function(){
             </a>`
 
             // Add li to itemlist
-            document.getElementById(UISelectors.itemList).insertAdjacentElement('beforeend', li);
+            document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
         },
         clearInputFields: function(){
             document.querySelector(UISelectors.itemNameInput).value = '';
             document.querySelector(UISelectors.itemCaloriesInput).value = '';
+        },
+        hideList: function(){
+            document.querySelector(UISelectors.itemList).style.display = 'none';
+        },
+        showTotalCalories: function(totalCalories){
+            document.querySelector(UISelectors.totalCalories).textContent = totalCalories;
         },
         getSelectors: function(){
             return UISelectors;
@@ -138,6 +162,12 @@ const App = (function(ItemCtrl, UICtrl) {
                 //Add Item to UI
                 UICtrl.addListItem(newItem);
 
+                 // Get the total calories
+                 const totalCalories = ItemCtrl.getTotalCalories();
+
+                // Show total Calories
+                 UICtrl.showTotalCalories(totalCalories);
+
                 // Clear input fields
                 UICtrl.clearInputFields();
             }
@@ -155,8 +185,19 @@ const App = (function(ItemCtrl, UICtrl) {
             // Fetch items from Data sturcture
             const items = ItemCtrl.getItems();
 
-            // Insert items to UI
-            UICtrl.porpulateListItems(items);
+            // Check if Items are present
+            if(items.length === 0){
+                UICtrl.hideList();
+            } else {
+                 // Insert items to UI
+                 UICtrl.porpulateListItems(items);
+            }
+
+            // Get the total calories
+            const totalCalories = ItemCtrl.getTotalCalories();
+
+            // Show total Calories
+            UICtrl.showTotalCalories(totalCalories);
 
             //Load event listeners
             loadEventListeners();

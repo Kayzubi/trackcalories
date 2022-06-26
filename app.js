@@ -27,7 +27,7 @@
         getItems: function() {
             return _state.items;
         },
-        addItem(name, calories){
+        addItem: function(name, calories){
             let ID;
             // Generate an ID
             if(_state.items.length > 0){
@@ -80,11 +80,31 @@ const UICtrl = (function(){
 
             document.getElementById(`${UISelectors.itemList}`).innerHTML = html;
         },
-        getItemInput(){
+        getItemInput: function(){
             return {
                 name:document.querySelector(UISelectors.itemNameInput).value,
                 calories:document.querySelector(UISelectors.itemCaloriesInput).value
             }
+        },
+        addListItem: function(item){
+            // Create an li element
+            const li = document.createElement('li');
+            // Add li class
+            li.className = 'collection-item';
+            // Add li ID
+            li.id = `item-${item.id}`;
+            // Add markup 
+            li.innerHTML =`<strong>${item.name}: </strong> <em>${item.calories} Calories</em>
+            <a href="#" class="secondary-content">
+              <i class="fa fa-pencil"></i>
+            </a>`
+
+            // Add li to itemlist
+            document.getElementById(UISelectors.itemList).insertAdjacentElement('beforeend', li);
+        },
+        clearInputFields: function(){
+            document.querySelector(UISelectors.itemNameInput).value = '';
+            document.querySelector(UISelectors.itemCaloriesInput).value = '';
         },
         getSelectors: function(){
             return UISelectors;
@@ -114,6 +134,12 @@ const App = (function(ItemCtrl, UICtrl) {
             if(input.name !== '' && input.calories !== ''){
                 //Add item
                 const newItem = ItemCtrl.addItem(input.name, input.calories);
+
+                //Add Item to UI
+                UICtrl.addListItem(newItem);
+
+                // Clear input fields
+                UICtrl.clearInputFields();
             }
             
             e.preventDefault();
